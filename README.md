@@ -150,3 +150,14 @@ jeu (TEXT) → Ex. "snake", "pong"
 score (INT)
 date_partie (DATETIME)
 
+
+
+| Étape | Objectif                               |
+| ----- | -------------------------------------- |
+| 1     | Choisir la stack technique             |
+| 2     | Interface Stream Deck de base          |
+| 3     | Connexion ESP32 ↔ PC avec MQTT         |
+| 4     | Développer un premier module (Horloge) |
+| 5     | Ajouter SQLite pour la sauvegarde      |
+| 6     | Ajouter les autres modules             |
+| 7     | Intégrer un mini-jeu (optionnel)       |
