@@ -119,6 +119,7 @@ Tu veux un jeu plutôt simple ou quelque chose d’un peu plus avancé avec plus
 
 
 📌 Proposition de structure BDD (SQLite, MySQL, Firebase...)
+
 1️⃣ Utilisateurs (gestion des profils et préférences)
 
 id_user (INT, PRIMARY KEY)
@@ -126,18 +127,21 @@ nom (TEXT)
 theme (TEXT) → Mode clair/sombre
 volume_defaut (FLOAT) → Niveau de volume enregistré
 date_creation (DATETIME)
+
 2️⃣ Configurations des modules (stocke les préférences des fonctionnalités)
 
 id_config (INT, PRIMARY KEY)
 id_user (INT, FOREIGN KEY → Utilisateurs)
 module (TEXT) → Ex. "equalizer", "dashboard", "horloge", "jeu"
 parametres (JSON/TEXT) → Stocke les réglages spécifiques
+
 3️⃣ Historique des actions (sauvegarde l’usage du Stream Deck)
 
 id_action (INT, PRIMARY KEY)
 id_user (INT, FOREIGN KEY → Utilisateurs)
 date (DATETIME)
 action (TEXT) → Ex. "lancé égaliseur", "changement de mode"
+
 4️⃣ Scores du mini-jeu 🎮
 
 id_score (INT, PRIMARY KEY)
