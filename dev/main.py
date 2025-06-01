@@ -3,15 +3,20 @@ import time
 from machine import Pin
 import neopixel
 from umqtt.simple import MQTTClient
-from dev.equalizer import main_loop
+import equalizer
+import dashboard
+import weather
+import clock
 
 # === Configuration Wi-Fi ===
 SSID = 'iPhonenono'
 PASSWORD = 'nonolagrinta'
 
 # === MQTT ===
+client = None
 BROKER = 'broker.emqx.io'
 TOPIC = b'infinity/test'
+client = MQTTClient("esp32client", BROKER)
 
 # === LED ===
 NUM_LEDS = 256
@@ -142,28 +147,28 @@ def draw_icon_color(matrice_index, pattern, colors):
 def module_equalizer():
     print("🎚️ Equalizer lancé")
     clear()
-    main_loop()
+    equalizer.main_loop(equalizer.DEVICE_ID, SSID, PASSWORD)
 
 def module_dashboard():
     print("📊 Dashboard lancé")
     clear()
-    draw_icon(1, DASHBOARD, BLUE)
+    dashboard.main_loop(dashboard.DEVICE_ID, SSID, PASSWORD)
 
 def module_horloge():
     print("⏰ Horloge lancée")
     clear()
-    draw_icon(2, CLOCK, BLUE)
+    clock.main_loop(clock.DEVICE_ID, SSID, PASSWORD)
 
 def module_meteo():
     print("🌦️ Météo lancée")
     clear()
-    draw_icon_color(3, METEO, METEO_COLORS)
+    weather.main_loop(weather.DEVICE_ID, SSID, PASSWORD)
 
 MODULES = {
     "equalizer": module_equalizer,
     "dashboard": module_dashboard,
-    "horloge": module_horloge,
-    "meteo": module_meteo
+    "clock": module_horloge,
+    "weather": module_meteo
 }
 
 # === Callback MQTT ===
@@ -185,7 +190,6 @@ def main():
     print("✅ Connecté au Wi-Fi :", wifi.ifconfig())
 
     # MQTT
-    client = MQTTClient("esp32client", BROKER)
     client.set_callback(mqtt_cb)
     client.connect()
     client.subscribe(TOPIC)

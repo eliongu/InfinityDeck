@@ -4,6 +4,7 @@ import network
 from machine import Pin
 import neopixel
 from umqtt.simple import MQTTClient
+import sys
 
 # === CONFIGURATIONS ===
 NUM_LEDS = 256
@@ -11,6 +12,10 @@ PIN_LED = 12
 MQTT_BROKER = "broker.emqx.io"  # À adapter
 MQTT_TOPIC = b"infinity/test"
 DEVICE_ID = b"equalizer01"
+
+# Module names
+MODULE_NAME = "equalizer"
+AVAILABLE_MODULES = ["clock", "equalizer", "weather", "dashboard"]
 
 np = neopixel.NeoPixel(Pin(PIN_LED, Pin.OUT), NUM_LEDS)
 prev_matrix = [(0, 0, 0)] * NUM_LEDS
@@ -76,10 +81,23 @@ def smooth_levels(curr_levels, target_levels, steps=10, delay=0.001):
 # === MQTT CALLBACK ===
 
 def mqtt_callback(topic, msg):
-    global module_active
-    if msg.decode() != "equalizer":
-        print("Changement de module demandé :", msg)
-        module_active = False  # Sortie du main_loop
+    try:
+        test_msg = msg.decode().lower()
+        print(f"Received test message: {test_msg}")
+        
+        if test_msg == "dashboard":
+            import dashboard
+            dashboard.main_loop(dashboard.DEVICE_ID, "iPhonenono", "nonolagrinta")
+        elif test_msg == "clock":
+            import clock
+            clock.main_loop(clock.DEVICE_ID, "iPhonenono", "nonolagrinta")
+        elif test_msg == "weather":
+            import weather
+            weather.main_loop(weather.DEVICE_ID, "iPhonenono", "nonolagrinta")
+        elif test_msg == "clear":
+            clear()
+    except Exception as e:
+        print(f"Error in MQTT callback: {e}")
 
 # === WIFI & MQTT SETUP ===
 
@@ -101,20 +119,26 @@ def setup_mqtt():
 
 # === MAIN LOOP ===
 
-def main_loop(client):
+def main_loop(client_id, ssid, password):
     curr_levels = [0] * 8
-    global module_active
-    while module_active:
+    client = setup_mqtt()
+    
+    while True:
         target_levels = [random.randint(0, 16) for _ in range(8)]
         smooth_levels(curr_levels, target_levels, steps=10, delay=0.0001)
         curr_levels = target_levels
-        client.check_msg()  # Vérifie les messages MQTT
+        client.check_msg()  # Check for MQTT messages
 
 # === MAIN ===
 
+def main():
+    """Main function to run the equalizer module"""
+    global module_active
+    module_active = True  # Reset the flag when starting
+    connect_wifi("iPhonenono", "nonolagrinta")
+    main_loop(DEVICE_ID, "iPhonenono", "nonolagrinta")
+    clear()  # Clean up display when exiting
+    print("Equalizer exited")
+
 if __name__ == "__main__":
-    connect_wifi("iPhonenono", "nonolagrinta")  # Remplace avec tes infos
-    mqtt_client = setup_mqtt()
-    main_loop(mqtt_client)
-    clear()  # Nettoie l'écran si on quitte le module
-    print("Equalizer quitté")
+    main()
