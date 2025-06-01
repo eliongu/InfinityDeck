@@ -315,7 +315,6 @@ def mqtt_callback(topic, msg):
                 (f"GPU:{gpu:.0f}° ", ORANGE),
             ]
             current_text_buffer = build_colored_text_buffer(text_parts)
-            print(f"Updated dashboard data - CPU: {cpu}%, RAM: {ram}%, GPU: {gpu}°")
         elif topic == MQTT_TEST_TOPIC:
             test_msg = msg.decode().lower()
             print(f"Received test message: {test_msg}")
@@ -342,7 +341,6 @@ def mqtt_callback(topic, msg):
                 clear()
     except Exception as e:
         print("Error parsing MQTT message:", e)
-        print(f"Topic: {topic}, Message: {msg.decode() if msg else 'None'}")
         current_text_buffer = None
 
 def setup_mqtt(client_id, broker, callback):
@@ -402,9 +400,6 @@ def main_loop(client_id, ssid, password):
             
             # Check MQTT messages again after display
             client.check_msg()
-            
-            # Small delay to prevent CPU overload
-            time.sleep(0.02)
             
         except Exception as e:
             print("Error in main loop:", e)
